@@ -14,7 +14,7 @@ sys.path.insert(0, str(ROOT / "packaging"))
 import package_engine  # noqa: E402
 
 CUDA12 = ("sm_60", "sm_61", "sm_70", "sm_75", "sm_80", "sm_86", "sm_89", "compute_89")
-CUDA13 = ("sm_75", "sm_86", "sm_89", "sm_120", "compute_120")
+CUDA13 = ("sm_75", "sm_80", "sm_86", "sm_89", "sm_120", "compute_120")
 
 
 class ReaderCheck(unittest.TestCase):
@@ -42,7 +42,7 @@ class ReaderCheck(unittest.TestCase):
         self.assertIn("3669", str(cm.exception))
 
     def test_a_cuda13_reader_does_not_pass_for_the_pascal_package(self):
-        self.reader("75;86;89;120")
+        self.reader("75;80;86;89;120")
         with self.assertRaises(SystemExit) as cm:
             self.check("cuda", "windows-x86_64", CUDA12, variant="cuda12")
         for n in ("sm_60", "sm_61", "sm_70"):
@@ -51,11 +51,11 @@ class ReaderCheck(unittest.TestCase):
     def test_a_reader_built_for_the_packages_archs_passes(self):
         self.reader("60;61;70;75;80;86;89")
         self.assertEqual(self.check("cuda", "linux-x86_64", CUDA12, variant="cuda12"), [])
-        self.reader(["75", "sm_86", "89-real", 120])
+        self.reader(["75", "sm_80", "sm_86", "89-real", 120])
         self.assertEqual(self.check("cuda", "windows-x86_64", CUDA13, variant="cuda13"), [])
 
     def test_allow_stale_vision_packages_it_and_says_what_is_missing(self):
-        self.reader("75;86;89;120")
+        self.reader("75;80;86;89;120")
         notes = self.check("cuda", "windows-x86_64", CUDA12, variant="cuda12", allow_stale=True)
         self.assertIn("sm_60", notes[0])
 
@@ -74,7 +74,7 @@ class ReaderCheck(unittest.TestCase):
         self.assertEqual(self.check("metal", "macos-arm64", ()), [])
 
     def test_build_runs_the_check_only_when_asked(self):
-        self.reader("75;86;89;120")
+        self.reader("75;80;86;89;120")
         out = Path(self.tmp.name) / "out"
         out.mkdir()
         with self.assertRaises(SystemExit) as cm:

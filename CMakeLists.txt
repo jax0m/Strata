@@ -242,9 +242,9 @@ elseif(STRATA_ENABLE_CUDA)
   find_package(CUDAToolkit REQUIRED)
   option(STRATA_EXPERIMENTAL_SM60 "community build for GPUs below compute capability 7.5: Pascal sm_60, Volta sm_70 (#236)" OFF)
   if(_strata_cuda_arch_defaulted)
-    # a recommendation, not a refusal: the release engine is built for 75;86;89;120, a hand build names its card
+    # a recommendation, not a refusal: the release engine is built for 75;80;86;89;120, a hand build names its card
     message(WARNING "Strata: CMAKE_CUDA_ARCHITECTURES was not set, so this build is for ${CMAKE_CUDA_ARCHITECTURES} only (sm_120 = RTX 50). For another "
-                    "card pass it: -DCMAKE_CUDA_ARCHITECTURES=native (the GPUs in this PC), 75 (RTX 20), 86 (RTX 30), "
+                    "card pass it: -DCMAKE_CUDA_ARCHITECTURES=native (the GPUs in this PC), 75 (RTX 20), 80 (A100 / A40), 86 (RTX 30), "
                     "89 (RTX 40), or a list like \"86;120\".")
   endif()
   foreach(_a IN LISTS CMAKE_CUDA_ARCHITECTURES)

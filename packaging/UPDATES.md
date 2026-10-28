@@ -43,7 +43,7 @@ Comments are for this document only; actual feed files must be strict JSON.
                                                   "size": 0, "sha256": "...", "installed_bytes": 0, "entry": "strata.py"}]},
   "engine": {"packages": [{
     "version": "0.1.50", "platform": "linux-x86_64", "backend": "cuda", "variant": "cuda13",
-    "archs": ["sm_75", "sm_86", "sm_89", "sm_120", "compute_120"], "min_driver": {"nvidia": "580.65"}, "min_runtime": null,
+    "archs": ["sm_75", "sm_80", "sm_86", "sm_89", "sm_120", "compute_120"], "min_driver": {"nvidia": "580.65"}, "min_runtime": null,
     "build_id": "be885026f96a-cuda13.0", "format": "tar.gz", "url": "engine/strata-engine-0.1.50-linux-x86_64-cuda-cuda13.tar.gz",
     "size": 505568970,                      // bytes of the archive
     "sha256": "...",                        // of the archive

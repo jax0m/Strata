@@ -2086,8 +2086,8 @@ def check_gpus(sel, found, what="", yes=False, named=False) -> None:
 
 def arch_numbers(value) -> list:
     """The CUDA architectures of a BUILD.json `archs` / `vision_archs` value, as numbers.  The packaging recipes write the picture
-    reader's as ONE string ("75;86;89;120", packaging/package_engine.py stamp_vision_archs, build_cuda_linux.sh), the engine's own as a
-    list of numbers ([75, 86, 89, 120]); [60, "sm_61", "70-real", "compute_89"] and "60,61 70" are read too (#3810: a string was
+    reader's as ONE string ("75;80;86;89;120", packaging/package_engine.py stamp_vision_archs, build_cuda_linux.sh), the engine's own as a
+    list of numbers ([75, 80, 86, 89, 120]); [60, "sm_61", "70-real", "compute_89"] and "60,61 70" are read too (#3810: a string was
     iterated character by character and setup stopped with int(';'))."""
     if value is None or value == "":
         return []
