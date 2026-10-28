@@ -2,7 +2,7 @@
 # Build the Linux CUDA engine package for the release feed.
 #
 #   VARIANT=cuda12 packaging/build_cuda_linux.sh     # CUDA 12.9: GTX 10 (Pascal), Tesla P100, V100, and the newer cards up to sm_89
-#   VARIANT=cuda13 packaging/build_cuda_linux.sh     # CUDA 13: RTX 20 and newer (sm_75 .. sm_120)
+#   VARIANT=cuda13 packaging/build_cuda_linux.sh     # CUDA 13: RTX 20 and newer, and the Ampere data-centre cards (sm_75, 80, 86, 89, 120)
 #
 # Run it on a Linux x86_64 box with the CUDA toolkit of that variant on PATH (nvcc), a Python 3 venv with requirements.txt and
 # requirements-build.txt, and the pinned llama.cpp in third_party/llama.cpp (python -c "import setup; setup.get_llama_cpp()").
@@ -11,12 +11,19 @@
 # The cuda12 package is the one the feed and docs/DOCKER.md offer to Pascal and Volta cards, so it needs machine code for sm_60,
 # sm_61 and sm_70 and the -DSTRATA_EXPERIMENTAL_SM60=ON build (#3503: the 0.2.1 package had sm_75 / 86 / 89 only, and a P100
 # container restarted in a loop with "this PC's GPU is sm_60"). packaging/package_engine.py refuses a cuda12 package without them.
+#
+# The cuda13 package carries sm_80 as well: that is the Ampere data-centre card (A100, A800, A40, A30 - compute capability 8.0). CUDA 13 compiles
+# for sm_80, and the source Dockerfile has listed it since its first version (Dockerfile, CUDA_ARCHITECTURES="75;80;86;89;120", #96); this recipe was
+# the one place that left it out. sm_86 machine code does not run on an sm_80 card (CUDA's rule: same major version, and no older minor), and
+# compute_120 PTX does not run backwards, so the whole package was refused there and the card went to CUDA 12 whatever the driver. Hopper (sm_90)
+# and the data-centre Blackwell cards (10.x) are not added: no one has run them on CUDA 13. If you have one and have measured it, build with
+# ARCHS="75;80;86;89;90;120". Each extra architecture is its own machine-code part: on 0.1.47 one architecture measured 78 MB and four 211 MB.
 set -eu
 variant=${VARIANT:-cuda13}
 repo=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd -P)
 case "$variant" in
   cuda12) archs=${ARCHS:-60;61;70;75;80;86;89}; mindriver=575.51; sm60=ON ;;
-  cuda13) archs=${ARCHS:-75;86;89;120}; mindriver=580.65; sm60=OFF ;;
+  cuda13) archs=${ARCHS:-75;80;86;89;120}; mindriver=580.65; sm60=OFF ;;
   *) echo "build_cuda_linux.sh: VARIANT must be cuda12 or cuda13" >&2; exit 2 ;;
 esac
 out=${OUT:-$repo/out-engine-$variant}

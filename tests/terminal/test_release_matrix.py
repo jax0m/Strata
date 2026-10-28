@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "packaging"))
 import feed_tool  # noqa: E402
 
 V = "0.1.45.3"
-SM_NEW = ("sm_75", "sm_86", "sm_89", "sm_120", "compute_120")                       # the CUDA 13 packages
+SM_NEW = ("sm_75", "sm_80", "sm_86", "sm_89", "sm_120", "compute_120")              # the CUDA 13 packages (sm_80: A100, A40, A30)
 SM_OLD = ("sm_60", "sm_61", "sm_70", "sm_75", "sm_80", "sm_86", "sm_89", "compute_89")   # the CUDA 12 packages (Pascal and Volta)
 
 
@@ -83,6 +83,9 @@ class ReleaseSelection(unittest.TestCase):
         self.assertEqual(self.pick(pc(win, "cuda", "615.71", ["sm_70"]))[0][2], "cuda12", "Volta is only in the CUDA 12 build")
         self.assertEqual(self.pick(pc("linux-x86_64", "cuda", "575.51", ["sm_75"]))[0][2], "cuda12")
         self.assertEqual(self.pick(pc("linux-x86_64", "cuda", "580.65", ["sm_75"]))[0][2], "cuda13")
+        self.assertEqual(self.pick(pc("linux-x86_64", "cuda", "580.65", ["sm_80"]))[0][2], "cuda13", "an A100 takes the CUDA 13 build")
+        self.assertEqual(self.pick(pc("windows-x86_64", "cuda", "610.00", ["sm_80"]))[0][2], "cuda13")
+        self.assertEqual(self.pick(pc("linux-x86_64", "cuda", "615.71", ["sm_90"]))[0][2], "cuda12", "Hopper has no CUDA 13 machine code yet")
 
     def test_the_dgx_spark_gets_the_aarch64_build_and_no_other_pc_does(self):
         self.assertEqual(self.pick(pc("linux-aarch64", "cuda", "580.173", ["sm_121"]))[0], ("linux-aarch64", "cuda", "cuda13"))

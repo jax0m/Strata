@@ -4,7 +4,7 @@
 # Most people want the ready-made images instead (nothing compiled): docs/DOCKER.md.
 #
 #   docker build -t strata:src .                                        # RTX 20/30/40/50 (compiles for each, ~25 min)
-#   docker build -t strata:src --build-arg CUDA_ARCHITECTURES=86 .      # one card only (faster); 86 = RTX 30, 89 = RTX 40, 120 = RTX 50
+#   docker build -t strata:src --build-arg CUDA_ARCHITECTURES=86 .      # one card only (faster); 80 = A100 / A40, 86 = RTX 30, 89 = RTX 40, 120 = RTX 50
 #   docker build -t strata:src-cuda12 --build-arg CUDA_IMAGE=nvidia/cuda:12.9.1-devel-ubuntu24.04 \
 #              --build-arg CUDA_ARCHITECTURES="60;61;70;75;80;86;89" --build-arg BUILD_VISION=0 .   # GTX 10 / P100 / V100 (driver 575+)
 #   docker run --rm --gpus all -p 127.0.0.1:8080:8080 --ulimit memlock=-1 --shm-size 2g --stop-timeout 120 \

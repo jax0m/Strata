@@ -17,7 +17,7 @@ Docker on a **Mac** has no access to the Mac's graphics chip (no Metal): use the
 
 | Your graphics card | Image tag | Needs on the computer |
 | --- | --- | --- |
-| NVIDIA **RTX 20, 30, 40, 50** series (and the matching RTX A / Quadro cards) | `0.2.7-cuda13` | NVIDIA driver **580 or newer**, [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) |
+| NVIDIA **RTX 20, 30, 40, 50** series (and the matching RTX A / Quadro cards), **Tesla A100, A800, A40, A30** and other cards at compute capability **8.0** | `0.2.7-cuda13` | NVIDIA driver **580 or newer**, [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) |
 | NVIDIA **GTX 10 (Pascal), Tesla P100, V100 (Volta)**, or any NVIDIA card whose driver is **575 to 579** | `0.2.7-cuda12` | NVIDIA driver **575 or newer**, the same toolkit |
 | AMD **RX 9000** series and Radeon AI PRO R9700 (RDNA 4, gfx1200 / gfx1201) | `0.2.7-rocm-gfx120x` | the `amdgpu` kernel driver (Linux 6.8+) |
 | AMD **RX 7000** series (RDNA 3, gfx1100 / gfx1101 / gfx1102) | `0.2.7-rocm-gfx110x` | the `amdgpu` kernel driver |
@@ -28,7 +28,9 @@ Docker on a **Mac** has no access to the Mac's graphics chip (no Metal): use the
 `rocm-gfx110x` 2.4 GB, `rocm-gfx1151` 1.5 GB. The download is about a third of that: `cuda13` 640 MB, `cuda12` 845 MB,
 `rocm-gfx120x` 505 MB, `rocm-gfx110x` 330 MB, `sycl` 450 MB. The model comes on top, on the first start. Current sizes may differ.
 
-Not sure which NVIDIA image? Take `cuda13` when `nvidia-smi` shows driver 580 or newer and the card is an RTX; otherwise `cuda12`.
+Not sure which NVIDIA image? Take `cuda13` when `nvidia-smi` shows driver 580 or newer and `nvidia-smi --query-gpu=compute_cap --format=csv,noheader`
+shows 7.5, 8.0, 8.6, 8.9, 12.0 or 12.1; otherwise `cuda12`. H100 and H200 (9.0) and the data-centre Blackwell cards (10.x) have no machine code
+in the CUDA 13 package: they run on `cuda12`, which reaches them by just-in-time compiling its PTX.
 A wrong pick does no harm: the container starts, says in plain words that the engine does not fit this card, and stops.
 
 **Ready-made images are published from version 0.2.1 on**, to the GitHub Container Registry: `ghcr.io/niko1221/strata:<version>-<flavor>`
