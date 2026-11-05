@@ -266,6 +266,120 @@ for _key, _per_sm in _INT3_ALLOWED.items():
         _old = _merged.get(_sm, (0, 0))
         _merged[_sm] = (max(_stack, _old[0]), max(_local, _old[1]))
 
+# sm_80 (A100, A800, A40, A30) joins the cuda13 release package with this packaging; no released engine carried sm_80
+# code before, so the table had no sm_80 column.  Measured on one compute 8.0 card (NVIDIA DRIVE-PG199-PROD, not an
+# A100 - another board could settle differently) with CUDA 13.4.92 (nvcc V13.4.92, gcc 13.3, Release,
+# -DSTRATA_CUDA_ARCHITECTURES=80), the libraries read with cuobjdump 13.4.  LOCAL is 0 in every frame: stack frames,
+# no spills.  Compared by kernel name with an sm_86 build of the same source and toolkit: of the 48 names below, 35
+# keep the same maximum, 5 are larger on sm_80 and 2 smaller; 6 names have a frame only on sm_80 and 6 only on sm_86.
+# Merged into ALLOWED by max, never lowered.  Not changed here: an sm_86 build of this same 13.4 tree reports four
+# frames the table does not carry yet (dflash2.cu.o's gemm_rows_kernel, gemm4_rows_kernel and rope_table_inv_kernel);
+# that gap is not about sm_80 and stays a separate finding.
+_SM80_ALLOWED = {
+    # the same frame as on sm_86
+    "q36k::k_route_group": {"sm_80": (32, 0)},
+    # sm_80 only: the sm_86 and sm_120 build of this tree keeps it in registers
+    "strata::kernels::block_scores_halve_kernel": {"sm_80": (16, 0)},
+    # sm_80 only: the sm_86 and sm_120 build of this tree keeps it in registers
+    "strata::kernels::native_down_lds_kernel": {"sm_80": (16, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::route_resident_k": {"sm_80": (40, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::attn_chunk_kernel": {"sm_80": (384, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::attn_chunk_kernel_pre75": {"sm_80": (8, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::attn_chunk_slots_kernel": {"sm_80": (384, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::block_topk_reg_kernel": {"sm_80": (96, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::copy_kernel": {"sm_80": (88, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::dequant_gu_kernel": {"sm_80": (32, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::dequant_kernel": {"sm_80": (64, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::expdec_down_kernel": {"sm_80": (288, 0)},
+    # 80 B here, 56 B on sm_86
+    "strata::kernels::{anonymous}::expdec_gu_kernel": {"sm_80": (80, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::gdn_step_commit_kernel": {"sm_80": (8, 0)},
+    # sm_80 only: the sm_86 and sm_120 build of this tree keeps it in registers
+    "strata::kernels::{anonymous}::gemm4_rows_kernel": {"sm_80": (8, 0)},
+    # 16 B here, 104 B on sm_86
+    "strata::kernels::{anonymous}::gemm8_kernel": {"sm_80": (16, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::gemm_iq_f16_grouped_kernel": {"sm_80": (32, 0)},
+    # sm_80 only: the sm_86 and sm_120 build of this tree keeps it in registers
+    "strata::kernels::{anonymous}::gemm_rows_kernel": {"sm_80": (8, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::gr_down_multi_kernel": {"sm_80": (8, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::gr_down_q8_kernel": {"sm_80": (16, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::gr_down_staged_kernel": {"sm_80": (16, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::gr_down_v3_kernel": {"sm_80": (8, 0)},
+    # 24 B here, 8 B on sm_86
+    "strata::kernels::{anonymous}::native_down_kernel": {"sm_80": (24, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::native_down_multi_kernel": {"sm_80": (64, 0)},
+    # 24 B here, 8 B on sm_86
+    "strata::kernels::{anonymous}::native_gu_kernel": {"sm_80": (24, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::native_gu_multi_kernel": {"sm_80": (144, 0)},
+    # 16 B here, 8 B on sm_86
+    "strata::kernels::{anonymous}::native_gu_swiglu_kernel": {"sm_80": (16, 0)},
+    # 8 B here, 24 B on sm_120
+    "strata::kernels::{anonymous}::native_mmvq_il_kernel": {"sm_80": (8, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::native_mmvq_il_pf_kernel": {"sm_80": (1336, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::pair_kernel": {"sm_80": (16, 0)},
+    # sm_80 only: the sm_86 and sm_120 build of this tree keeps it in registers
+    "strata::kernels::{anonymous}::q8sm60::kernel": {"sm_80": (8, 0)},
+    # the same frame as on sm_120
+    "strata::kernels::{anonymous}::rope_table_inv_kernel": {"sm_80": (32, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::rope_table_kernel": {"sm_80": (32, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::route": {"sm_80": (64, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::route_multi": {"sm_80": (64, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::route_prior_k": {"sm_80": (64, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::route_topk": {"sm_80": (32, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::s26_gu_l_kernel": {"sm_80": (32, 0)},
+    # the same frame as on sm_86
+    "strata::kernels::{anonymous}::s27_gu_kernel": {"sm_80": (32, 0)},
+    # 40 B here, 48 B on sm_86
+    "strata::prefill::fused::{anonymous}::native_kernel": {"sm_80": (40, 0)},
+    # the same frame as on sm_86
+    "strata::prefill::{anonymous}::gdn_conv_w_kernel": {"sm_80": (24, 0)},
+    # 136 B here, 128 B on sm_86
+    "strata::prefill::{anonymous}::gdn_tc_scan_kernel": {"sm_80": (136, 0)},
+    # the same frame as on sm_86
+    "strata::prefill::{anonymous}::gr_write_cvec_norm_rs_kernel": {"sm_80": (40, 0)},
+    # the same frame as on sm_86
+    "strata::prefill::{anonymous}::gr_write_norm_rs_kernel": {"sm_80": (40, 0)},
+    # the same frame as on sm_86
+    "strata::prefill::{anonymous}::rms_rope_rows_kernel": {"sm_80": (32, 0)},
+    # the same frame as on sm_86
+    "strata::prefill::{anonymous}::rope_kernel": {"sm_80": (32, 0)},
+    # the same frame as on sm_86
+    "strata::prefill::{anonymous}::route_kernel": {"sm_80": (64, 0)},
+    # the same frame as on sm_86
+    "{anonymous}::k_attn_prep": {"sm_80": (32, 0)},
+}
+
+for _key, _per_sm in _SM80_ALLOWED.items():
+    _merged = ALLOWED.setdefault(_key, {})
+    for _sm, (_stack, _local) in _per_sm.items():
+        _old = _merged.get(_sm, (0, 0))
+        _merged[_sm] = (max(_stack, _old[0]), max(_local, _old[1]))
+
 
 
 
